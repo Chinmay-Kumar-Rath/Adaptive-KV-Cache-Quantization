@@ -10,6 +10,7 @@ In transformer models, to avoid recomputing previous token representations at ev
 
 The key insight: **not all tokens are equally important**. Tokens that receive more cumulative attention from subsequent tokens matter more for output quality. Less important tokens can be stored at lower precision without meaningfully affecting results.
 
+
 ---
 
 ## How It Works
@@ -74,21 +75,21 @@ python main_using_GPT2.py
 
 Memory savings stabilize around **50%** as token count grows. MSE is near zero for most steps but spikes occasionally due to large value ranges in unnormalized random tensors — an expected limitation of naive per-tensor quantization without normalization.
 
-![Random Weights Results](results_random.png)
+![Random Weights Results](Figure_4Results_With_100Tokens(Random_numbers).png)
 
-### GPT-2 Embeddings (dim=768, 400 real tokens)
+### GPT-2 Embeddings (dim=768, 4500 real tokens)
 
 With real GPT-2 embeddings and scaled weight matrices, results are significantly cleaner.
 
 | Metric | Value |
 |--------|-------|
 | Memory saved (stable) | ~50% |
-| Relative MSE (peak) | ~0.0032 |
-| Relative MSE (stable) | ~0.0004 |
+| Relative MSE (peak) | ~0.0047 |
+| Relative MSE (stable) | ~0.0007 |
 
 MSE starts high for the first few tokens (cache is small, importance scores not yet stable) then drops and stabilizes below 0.001 — less than 0.1% relative error despite 50% memory reduction.
 
-![GPT-2 Results](results_gpt2.png)
+![GPT-2 Results](Figure_1Results_With_4500Tokens(In_GPT2).png)
 
 ---
 
@@ -126,4 +127,4 @@ Early tokens do not dominate importance forever. Recent attention patterns influ
 
 ## Inspiration
 
-Inspired by [TurboQuant](https://arxiv.org/abs/2501.12373) and related work on KV cache compression for efficient LLM inference.
+Inspired by [TurboQuant](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/) and related work on KV cache compression for efficient LLM inference.
